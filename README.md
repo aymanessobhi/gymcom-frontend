@@ -1,4 +1,4 @@
-# gymcom-fe
+# ppm-fe
 
 
 
@@ -15,14 +15,14 @@ Already a pro? Just edit this README.md and make it your own. Want to make it ea
 
 ```
 cd existing_repo
-git remote add origin https://gitlab.com/ideracloud/gymcom/gymcom-fe.git
+git remote add origin https://gitlab.com/ideracloud/ppm/ppm-fe.git
 git branch -M main
 git push -uf origin main
 ```
 
 ## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.com/ideracloud/gymcom/gymcom-fe/-/settings/integrations)
+- [ ] [Set up project integrations](https://gitlab.com/ideracloud/ppm/ppm-fe/-/settings/integrations)
 
 ## Collaborate with your team
 
