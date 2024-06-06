@@ -1,0 +1,19 @@
+.custom-table th,
+.custom-table td {
+    border: 1px solid #dee2e6 !important;
+}
+
+.custom-table {
+    border-collapse: collapse !important;
+}
+
+.custom-table th {
+    background-color: #f8f9fa;
+}
+.custom-tableA{
+    display: flex;
+    justify-content: center;
+}
+.table-responsive{
+    background-color: #ffffff;
+}

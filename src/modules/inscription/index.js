@@ -11,6 +11,7 @@ import PaiementTab from "./PaiementTab";
 
 const Inscription = () => {
 
+    const [filesToUpload, setFilesToUpload] = useState([]);
     const [activeTab, setActive] = useState(1);
     const [progressValue, setProgressValue] = useState(25);
 
@@ -35,7 +36,7 @@ const initForm = {
         initialValues: { ...formState },
         enableReinitialize: true,
         onSubmit: (values) => {
-            console.log('valusss',values);
+            console.log('valusss',filesToUpload,values);
             let payload = {
                 data: values,
                 onSuccess: () => {
@@ -92,7 +93,7 @@ const initForm = {
                         <TabContent activeTab={activeTab} className="twitter-bs-wizard-tab-content">
                             <TabPane tabId={1}>
                                 <AbonnementTab formik={formik} />
-                                <AbonnementImage formik={formik} />
+                                <AbonnementImage setFilesToUpload={setFilesToUpload} />
 
                                 
                             </TabPane>
