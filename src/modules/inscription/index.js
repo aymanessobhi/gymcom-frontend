@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useFormik ,Field} from "formik";
+
 import { Col, Container, Form, Input, Label, NavItem, NavLink, Progress, Row, TabContent, TabPane } from "reactstrap";
 import classnames from 'classnames';
 import { Link } from "react-router-dom";
 import AbonnementTab from "./AbonnementTab";
+import AbonnementImage from "./AbonnementImage";
+
 import PaiementTab from "./PaiementTab";
 
 const Inscription = () => {
@@ -10,15 +14,47 @@ const Inscription = () => {
     const [activeTab, setActive] = useState(1);
     const [progressValue, setProgressValue] = useState(25);
 
+    
+
+
+
+const initForm = {  
+    nom: '', 
+    prenom: '',
+    tele: '', 
+    date: '', 
+    cin: '', 
+    abonnment: '', 
+    dateDebut: '', 
+    dateFin: '', 
+    active: '', 
+    };
+    const [formState, setForm] = useState(initForm);
+
+    const formik = useFormik({
+        initialValues: { ...formState },
+        enableReinitialize: true,
+        onSubmit: (values) => {
+            console.log('valusss',values);
+            let payload = {
+                data: values,
+                onSuccess: () => {
+                    // navigate(DATABASE_ARTICLE_PAGE)
+                }
+            }
+            // dispatch(articleActions.create(payload));
+        }
+    });
+
     const toggleTab = (tab) => {
         if (activeTab !== tab) {
-            if (tab >= 1 && tab <= 4) {
+            if (tab >= 1 && tab <= 3) {
                 setActive(tab);
 
                 if (tab === 1) { setProgressValue(25) }
                 if (tab === 2) { setProgressValue(50) }
-                if (tab === 3) { setProgressValue(75) }
-                if (tab === 4) { setProgressValue(100) }
+                if (tab === 3) { setProgressValue(100) }
+            
             }
         }
     }
@@ -37,13 +73,13 @@ const Inscription = () => {
                             </NavItem>
                             
                             <NavItem>
-                                <NavLink className={classnames({ active: activeTab === 3 })} onClick={() => { toggleTab(3); }} >
+                                <NavLink className={classnames({ active: activeTab === 2 })} onClick={() => { toggleTab(2); }} >
                                     <span className="step-number">02</span>
                                     <span className="step-title">PAIEMENT</span>
                                 </NavLink>
                             </NavItem>
                             <NavItem>
-                                <NavLink className={classnames({ active: activeTab === 4 })} onClick={() => { toggleTab(4); }} >
+                                <NavLink className={classnames({ active: activeTab === 3 })} onClick={() => { toggleTab(3); }} >
                                     <span className="step-number">03</span>
                                     <span className="step-title">Confirmation</span>
                                 </NavLink>
@@ -55,7 +91,10 @@ const Inscription = () => {
                         </div>
                         <TabContent activeTab={activeTab} className="twitter-bs-wizard-tab-content">
                             <TabPane tabId={1}>
-                                <AbonnementTab/>
+                                <AbonnementTab formik={formik} />
+                                <AbonnementImage formik={formik} />
+
+                                
                             </TabPane>
                             <TabPane tabId={2}>
                                 <PaiementTab/>
