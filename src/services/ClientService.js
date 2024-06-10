@@ -30,31 +30,15 @@ export const updateClient = (updated, id) => {
   return axios.put(`${config.url}/client/${id}`, JSON.stringify(updated), { headers: headers });
 }
 
-export const uploadImageClient = (formData) => {
-    
-  return axios.post(`${config.url}/client/upload`, formData, {
-    headers: {
-      'content-type': 'multipart/form-data'
-    },
-  });
-}
+export const uploadData = async (formData) => {
+  let headers = { "Content-type": "multipart/form-data"}
+  return await axios.post(`${config.baseURL}/inscription/upload`, formData, { headers: headers });
+};
 
-export const setPrincipleImage = (id) => {
-    
-  return axios.put(`${config.url}/client/image/principle/${id}`, {
-    headers: {
-      'content-type': 'application/json'
-    }
-  });
-}
+export const downloadFile = async (filename) => {
+  return await axios.get(`${config.baseURL}/inscription/load?filename=${filename}`);
+};
 
-export const setPrincipleClientImage = (id) => {
-  return axios.put(`${config.url}/client/image/principle/${id}`, {
-    headers: {
-      'content-type': 'application/json'
-    }
-  });
-}
 
 export const deleteImage = (fileId) => {
   return axios.delete(`${config.url}/client/delete/${fileId}`);

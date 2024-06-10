@@ -1,6 +1,6 @@
 import { call, put } from "redux-saga/effects";
 import { createModule } from "saga-slice";
-import {  findClientById,  loadClients, saveClient ,  setPrincipleImage, updateClient , uploadImageClient } from "../services/ClientService";
+import {  downloadFile, findClientById,  loadClients, saveClient ,  setPrincipleImage, updateClient , uploadData, uploadImageClient } from "../services/clientService";
 
 const clientSlice = createModule({
     name:"client",
@@ -106,30 +106,28 @@ const clientSlice = createModule({
                 yield call(payload.onError, e);
             }
         },
-        *[A.upload]({payload}){
+        *[A.uploadFile]({payload}) {
             try {
-                for (const value of payload.data.values()) {
-                    console.log(value);
-                }
-                yield uploadImageClient(payload.data);
-                yield call(payload.onSuccess);
-            } catch(e) {
+                const { data } = yield uploadData(payload.formData);
+                yield put(A.finishFetching());
+                yield call(payload.onSuccess, data?.body);
+            } catch (e) {
+                console.log(e);
                 yield put(A.finishFetching());
                 yield put(A.fetchError());
-                yield call(payload.onError, e);
             }
         },
-        *[A.choosePrinciple]({payload}){
-            try{
-                console.log(payload)
-                yield setPrincipleImage(payload.id);
-                yield call(payload.onSuccess);
-            }catch(e){
-                yield put(A.finishFetching());
-                yield put(A.fetchError());
-                yield call(payload.onError, e);
+        *[A.downloadFile]({ payload }) {
+            try {
+              const { data } = yield downloadFile(payload.filename);
+              yield put(A.finishFetching());
+              yield call(payload.onSuccess(data));
+            } catch (e) {
+              console.log(e);
+              yield put(A.finishFetching());
+              yield put(A.fetchError());
             }
-        },
+          },
     })
 })
 

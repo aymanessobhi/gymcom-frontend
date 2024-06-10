@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from 'react-redux';
-import { Col, Container,  NavItem, NavLink, Progress,  TabContent, TabPane } from "reactstrap";
+import { Col, Container, NavItem, NavLink, Progress, TabContent, TabPane } from "reactstrap";
 import classnames from 'classnames';
 import { Link } from "react-router-dom";
 import AbonnementTab from "./AbonnementTab";
@@ -10,6 +10,7 @@ import { clientActions } from '../../sagas/clientSlice';
 
 
 import PaiementTab from "./PaiementTab";
+import { AvForm } from "availity-reactstrap-validation";
 
 const Inscription = () => {
 
@@ -17,20 +18,21 @@ const Inscription = () => {
     const [activeTab, setActive] = useState(1);
     const [progressValue, setProgressValue] = useState(25);
 
-    
 
 
 
-const initForm = {  
-    nom: '', 
-    prenom: '',
-    tele: '', 
-    date: '', 
-    cin: '', 
-    abonnment: '', 
-    dateDebut: '', 
-    dateFin: '', 
-    active: '', 
+
+    const initForm = {
+        nom: '',
+        prenom: '',
+        tele: '',
+        date: '',
+        cin: '',
+        abonnment: '',
+        dateDebut: '',
+        dateFin: '',
+        active: '',
+        documents: []
     };
     const [formState, setForm] = useState(initForm);
     const dispatch = useDispatch();
@@ -40,7 +42,7 @@ const initForm = {
         initialValues: { ...formState },
         enableReinitialize: true,
         onSubmit: (values) => {
-            console.log('valussss',filesToUpload,values);
+            console.log('valussss', filesToUpload, values);
             // dispatch(clientActions.addClient(values));
             let payload = {
                 data: values,
@@ -60,7 +62,7 @@ const initForm = {
                 if (tab === 1) { setProgressValue(25) }
                 if (tab === 2) { setProgressValue(50) }
                 if (tab === 3) { setProgressValue(100) }
-            
+
             }
         }
     }
@@ -77,7 +79,7 @@ const initForm = {
                                     <span className="step-title">IDENFICATION DE L'ABONNE </span>
                                 </NavLink>
                             </NavItem>
-                            
+
                             <NavItem>
                                 <NavLink className={classnames({ active: activeTab === 2 })} onClick={() => { toggleTab(2); }} >
                                     <span className="step-number">02</span>
@@ -97,15 +99,14 @@ const initForm = {
                         </div>
                         <TabContent activeTab={activeTab} className="twitter-bs-wizard-tab-content">
                             <TabPane tabId={1}>
-                                <AbonnementTab formik={formik} />
-                                <AbonnementImage setFilesToUpload={setFilesToUpload} />
-
-                                
+                                <AvForm className="needs-validation" onValidSubmit={formik.handleSubmit} >
+                                    <AbonnementTab formik={formik} />
+                                </AvForm>
                             </TabPane>
                             <TabPane tabId={2}>
-                                <PaiementTab/>
+                                <PaiementTab />
                             </TabPane>
-                            
+
                             <TabPane tabId={4}>
                                 <div className="row justify-content-center">
                                     <Col lg="6">

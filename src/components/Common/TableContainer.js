@@ -169,19 +169,7 @@ const TableContainer = ({
   return (
     <Fragment>
       <Row className="mb-2">
-        <Col md={customPageSizeOptions ? 2 : 1}>
-          <select
-            className="form-select"
-            value={pageSize}
-            onChange={onChangeInSelect}
-          >
-            {[10, 20, 30, 40, 50].map(pageSize => (
-              <option key={pageSize} value={pageSize}>
-                Show {pageSize}
-              </option>
-            ))}
-          </select>
-        </Col>
+        
         {isGlobalFilter && (
           <GlobalFilter
             preGlobalFilteredRows={preGlobalFilteredRows}
@@ -220,11 +208,7 @@ const TableContainer = ({
             </div>
           </Col>
         )}
-        <Col  sm="7">
-          <div className="input-group">
-            <input accept="application/vnd.ms-excelapplication/vnd.openxmlformats-officedocument.spreadsheetml.sheet" type="file" className="form-control" id="customFile" onChange={handleUpload}/>
-          </div>
-        </Col>
+        
         {isAddStationList && (
           <Col sm="3">
             <div className="text-sm-end">

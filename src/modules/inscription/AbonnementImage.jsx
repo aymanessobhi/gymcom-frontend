@@ -1,211 +1,208 @@
-import React,{ useEffect, useState, useRef } from "react";
-import { AvField, AvForm } from 'availity-reactstrap-validation';
-import { useTranslation } from 'react-i18next';
-import {  Col,  Row ,Table ,Input  ,Button  } from 'reactstrap';
-import './MyForm.css';  // Import the CSS file
+import { AvField } from "availity-reactstrap-validation";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useDispatch, useSelector } from "react-redux";
+import { Button, Col, Container, Label, Row } from "reactstrap";
+import { Link } from "react-router-dom";
+import TableContainer from '../../components/Common/TableContainer';
+import { clientActions } from "../../sagas/clientSlice";
 
 
-const AbonnementImage = ({ setFilesToUpload }) => {
-    const [selectedFiles, setSelectedFiles] = useState({ photo: null, cinRecto: null, cinVerso: null });
-    const inputFileRefs = {
-        photo: useRef(null),
-        cinRecto: useRef(null),
-        cinVerso: useRef(null),
-    };
+const AbonnementImage = ({ formik }) => {
+    const [file, setFile] = useState(null);
+    const [docType, setDocType] = useState(null);
+    const [documents, setDocuments] = useState([]);
+    const { isFetching } = useSelector(state => state.client);
 
-    const [files, setFiles] = useState([]);
-    const inputFileRef = useRef();
     const { t } = useTranslation('translation');
+    const { getFieldProps, values, setFieldValue } = formik;
+    const { documentType } = useSelector(state => state.data);
+    const dispatch = useDispatch();
 
-    const handleRemoveFile = (file) => {
-        if (files.length !== 0) {
-            setFiles(files.filter(d => d.name !== file.name));
+    useEffect(() => {
+        if (values.documents.length > 0) {
+            setDocuments([...values.documents]);
         }
-        inputFileRef.current.value = null;
+    }, [values.documents])
+
+    const handleSelectedFile = (event) => {
+        const files = event.target.files;
+        setFile(files[0])
+        let doc = {
+            id: Math.floor(Math.random() * (600 - 99 + 1)) + 99,
+            file: files[0],
+            documentType: docType,
+        }
+
+        uploadDoc(doc)
     }
 
-    const selectFile = (imageKey) => {
-        inputFileRefs[imageKey].current.click();
-    };
+    const handleAddFile = (doc) => {
+        setFieldValue("documents", [...values.documents, doc])
+    }
 
-    const handleSelectFile = (event,imageKey) => {
-        setSelectedFiles({
-            ...selectedFiles,
-            [imageKey]: event.target.files[0]
-        });
-    };
+    const uploadDoc = (doc) => {
+        const formData = new FormData();
+        formData.append("file", doc.file);
+        formData.append("inscriptionId", 0);
+        formData.append("documentType", doc.documentType);
+        let payload = {
+            formData: formData,
+            onSuccess: (data) => {
+                handleAddFile(data)
+            },
+            onError: (error) => {
+                console.log(error)
+            },
+        };
+        dispatch(clientActions.uploadFile(payload));
+    }
 
-    const handleUpload = () => {
-        if (selectedFiles) {
-            
-            setFiles([...files, selectedFiles]);
-            selectedFiles(undefined);
-            inputFileRef.current.value = null;
-        }
-    };
-    useEffect(() => {
-        setFilesToUpload(files);
-    }, [files, setFilesToUpload]);
+
+    const columns = [
+        {
+            Header: t('inscription.documentType'),
+            accessor: 'type',
+            disableFilters: true,
+            filterable: false,
+        },
+        {
+            Header: t('inscription.filename'),
+            accessor: 'filenameUser',
+            disableFilters: true,
+            filterable: false,
+        },
+
+        {
+            Header: t('actions.title'),
+            accessor: (cellProps) => {
+                return (
+                    <React.Fragment>
+                        <Link className="me-3 text-primary"
+                        //onClick={() => handleEdit(cellProps)}
+                        >
+                            <i className="ri-delete-bin-2-line"></i></Link>
+
+                        <Link className="me-3 text-primary"
+                            onClick={() => {
+                                let payload = {
+                                    filename: cellProps.row.filename,
+                                    onSuccess: (response) => {
+                                        if (cellProps.row?.fileType == "application/pdf") {
+                                            const linkSource = `data:application/pdf;base64,${response}`;
+                                            const downloadLink = document.createElement("a");
+                                            downloadLink.href = linkSource;
+                                            downloadLink.download = cellProps.row?.filenameUser;
+                                            downloadLink.click();
+                                        } else {
+                                            var blob = new Blob([Uint8Array.from(atob(response), c => c.charCodeAt(0))], { type: "application/octet-stream" });
+                                            var url = window.URL.createObjectURL(blob);
+                                            var a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = cellProps.row.filenameUser;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                        }
+                                    }
+                                }
+
+                                dispatch(clientActions.downloadFile(payload))
+                            }}
+                        >
+                            <i className="ri-file-download-line"></i></Link>
+                    </React.Fragment>
+                )
+            },
+            disableFilters: true,
+            filterable: false,
+        },
+    ];
+
+
 
     return (
+        <React.Fragment>
+            {isFetching ? <div id="preloader">
+                <div id="status">
+                    <div className="spinner">
+                        <i className="ri-loader-line spin-icon"></i>
+                    </div>
+                </div>
+            </div> :
+                <Container fluid={true}>
+                    <Row>
+                        <Col md="2">
+                            <Label className="form-label" htmlFor="genre">{t('inscription.documentType')}</Label>
+                        </Col>
+                        <Col md="4">
+                            <AvField
+                                type="select"
+                                className="form-control"
+                                name="docType"
+                                onChange={(e) => {
+                                    setDocType(e.target.value || undefined);
+                                }}
+                                validate={{ required: { value: false } }}
+                                id="documentType">
+                                <option value="">{t('Sélectionner...')}</option>
+                                {documentType.map((g, index) => (
+                                    <option key={index} value={g.code}>
+                                        {g.description}
+                                    </option>
+                                ))}
+                            </AvField>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col sm="8">
+                            <div className="input-group">
+                                <input accept="application/pdf, image/jpeg, image/png, image/gif, image/bmp" type="file" className="form-control" id="customFile" onChange={handleSelectedFile} />
+                                <div className="input-group mt-3">
+                                    {file && <small>{file.name}</small>}
+                                    {file && <Button className="mx-2" size="sm" type="button" color="danger" onClick={() => { setFile(null) }}><i class="ri-delete-bin-2-line"></i></Button>}
+                                    {file && <Button size="sm" type="button" color="info" onClick={() => {
+                                        const url = window.URL.createObjectURL(file);
+                                        if (file?.type == "application/pdf") {
+                                            window.open(url, '_blank').focus();
+                                        } else {
+                                            const link = document.createElement("a");
+                                            link.href = url;
+                                            link.setAttribute(
+                                                "download",
+                                                `${file.name}`
+                                            );
+                                            document.body.appendChild(link);
+                                            link.click();
+                                        }
+                                    }}><i class="ri-file-download-line"></i></Button>}
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <TableContainer
+                            columns={columns || []}
+                            data={documents ?? []}
+                            isPagination={false}
+                            isAddParamList={true}
+                            customPageSizeOptions={true}
+                            iscustomPageSize={false}
+                            isBordered={false}
+                            customPageSize={10}
+                            canDownloadtemp={true}
+                            isGlobalFilter={false}
+                            className="table-primary"
+
+                        //handleDownloadTemp={() => downloadTemp()}
+                        //handleUpload={uploadData}
+                        />
+                    </Row>
+                </Container>}
+        </React.Fragment>
 
 
-                    <AvForm>
-                                <Row>
-                                    <Col md="12">
-                                        <div className="mb-3">
-                                            <h4 className="card-title">Client Images</h4>
-                                            <div className="table-responsive">
-                                                <Table bordered className="custom-table">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Type</th>
-                                                            <th>Télécharger</th>
-                                                            <th>Aperçu</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr>
-                                                            <td>Photo</td>
-                                                            <td className="custom-tableA">
-                                                                <Input
-                                                                    accept="image/png, image/jpeg"
-                                                                    name="btn-upload-photo"
-                                                                    style={{ display: 'none' }}
-                                                                    innerRef={inputFileRefs.photo}
-                                                                    type="file"
-                                                                    onChange={(event) => handleSelectFile(event, 'photo')}
-                                                                />
-                                                                <Button color="primary" onClick={() => selectFile('photo')}>
-                                                                    Select File
-                                                                </Button>
-                                                                <Input
-                                                                    name="btn-upload-photo"
-                                                                    disabled={true}
-                                                                    type="text"
-                                                                    value={selectedFiles.photo ? selectedFiles.photo.name : ""}
-                                                                    style={{ marginLeft: 8, marginTop: 8 ,maxWidth : 200 }}
-                                                                />
-                                                            </td>
-                                                            <td>
-                                                                {selectedFiles.photo && (
-                                                                    <div
-                                                                        style={{
-                                                                            overflowY: 'auto',
-                                                                            marginTop: '16px',
-                                                                            marginRight: '-8px',
-                                                                            paddingRight: '8px',
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={URL.createObjectURL(selectedFiles.photo)}
-                                                                            alt="Selected photo"
-                                                                            style={{ maxWidth: '100px', height: '100px' }}
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>CIN (recto)</td>
-                                                            <td className="custom-tableA">
-                                                                <Input
-                                                                    accept="image/png, image/jpeg"
-                                                                    name="btn-upload-cin-recto"
-                                                                    style={{ display: 'none' }}
-                                                                    innerRef={inputFileRefs.cinRecto}
-                                                                    type="file"
-                                                                    onChange={(event) => handleSelectFile(event, 'cinRecto')}
-                                                                />
-                                                                <Button color="primary" onClick={() => selectFile('cinRecto')}>
-                                                                    Select File
-                                                                </Button>
-                                                                <Input
-                                                                    name="btn-upload-cin-recto"
-                                                                    disabled={true}
-                                                                    type="text"
-                                                                    value={selectedFiles.cinRecto ? selectedFiles.cinRecto.name : ""}
-                                                                    style={{ marginLeft: 8, marginTop: 8 ,maxWidth : 200 }}
-                                                                />
-                                                            </td>
-                                                            <td>
-                                                                {selectedFiles.cinRecto && (
-                                                                    <div
-                                                                        style={{
-                                                                            overflowY: 'auto',
-                                                                            marginTop: '16px',
-                                                                            marginRight: '-8px',
-                                                                            paddingRight: '8px',
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={URL.createObjectURL(selectedFiles.cinRecto)}
-                                                                            alt="Selected CIN (recto)"
-                                                                            style={{ maxWidth: '100px', height: '100px' }}
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>CIN (verso)</td>
-                                                            <td className="custom-tableA">
-                                                                <Input
-                                                                    accept="image/png, image/jpeg"
-                                                                    name="btn-upload-cin-verso"
-                                                                    style={{ display: 'none' }}
-                                                                    innerRef={inputFileRefs.cinVerso}
-                                                                    type="file"
-                                                                    onChange={(event) => handleSelectFile(event, 'cinVerso')}
-                                                                />
-                                                                <Button color="primary" onClick={() => selectFile('cinVerso')}>
-                                                                    Select File
-                                                                </Button>
-                                                                <Input
-                                                                    name="btn-upload-cin-verso"
-                                                                    disabled={true}
-                                                                    type="text"
-                                                                    value={selectedFiles.cinVerso ? selectedFiles.cinVerso.name : ""}
-                                                                    style={{ marginLeft: 8, marginTop: 8 ,maxWidth : 200 }}
-                                                                />
-                                                            </td>
-                                                            <td>
-                                                                {selectedFiles.cinVerso && (
-                                                                    <div
-                                                                        style={{
-                                                                            overflowY: 'auto',
-                                                                            marginTop: '16px',
-                                                                            marginRight: '-8px',
-                                                                            paddingRight: '8px',
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            src={URL.createObjectURL(selectedFiles.cinVerso)}
-                                                                            alt="Selected CIN (verso)"
-                                                                            style={{ maxWidth: '100px', height: '100px' }}
-                                                                        />
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </Table>
-                                            </div>
-                                            <Button
-                                                color="success"
-                                                disabled={!selectedFiles.photo || !selectedFiles.cinRecto || !selectedFiles.cinVerso}
-                                                onClick={handleUpload}
-                                                style={{ marginTop: 16 }}
-                                            >
-                                                Télécharger
-                                            </Button>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </AvForm>
 
-        
-         
 
     );
 }
