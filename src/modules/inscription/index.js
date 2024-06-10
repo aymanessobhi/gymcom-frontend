@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useFormik ,Field} from "formik";
-
-import { Col, Container, Form, Input, Label, NavItem, NavLink, Progress, Row, TabContent, TabPane } from "reactstrap";
+import { useFormik } from "formik";
+import { useDispatch, useSelector } from 'react-redux';
+import { Col, Container,  NavItem, NavLink, Progress,  TabContent, TabPane } from "reactstrap";
 import classnames from 'classnames';
 import { Link } from "react-router-dom";
 import AbonnementTab from "./AbonnementTab";
 import AbonnementImage from "./AbonnementImage";
+import { clientActions } from '../../sagas/clientSlice';
+
 
 import PaiementTab from "./PaiementTab";
 
@@ -31,12 +33,15 @@ const initForm = {
     active: '', 
     };
     const [formState, setForm] = useState(initForm);
+    const dispatch = useDispatch();
+
 
     const formik = useFormik({
         initialValues: { ...formState },
         enableReinitialize: true,
         onSubmit: (values) => {
-            console.log('valusss',filesToUpload,values);
+            console.log('valussss',filesToUpload,values);
+            // dispatch(clientActions.addClient(values));
             let payload = {
                 data: values,
                 onSuccess: () => {
