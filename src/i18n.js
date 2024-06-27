@@ -18,7 +18,28 @@ const resources = {
   fr: {
     translation: {
       inscription:{
+        nom:"Nom",
+        prenom:"Prénoms",
+        telephone:"Contact téléphonique",
         documentType:"Pièce jointe",
+        datenaiss:"Date de naissance",
+        genre:"Genre",
+        cin:"CIN",
+        abonnement:"Type d'abonnement",
+        dateDebut:"Date de debut",
+        dateFin:"Date de Fin",
+        identification:"Identification de l'abonné",
+        active:"Active"
+      },
+      paiement:{
+        type:"Type paiement",
+        numeroCheque:"Numéro du chèque",
+        dateDebut:"Date de debut",
+        totalAPaye:"Total à payé",
+        montantPaye:"Montant payé",
+        resteAPaye:"Rest à payé",
+        assuranceInclu:"Frais d'assurance inclus",
+        datePaiementCheque:"Date paiement chèque"
       },
       login: {
         title: "Connectez-vous pour continuer sur Performance Pathfinder Metrics.",

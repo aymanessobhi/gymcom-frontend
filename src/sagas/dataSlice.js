@@ -8,6 +8,8 @@ const dataSlice = createModule({
         genre:[],
         documentType:[],
         status:[],
+        typePaiement:[],
+        typeAbonnement:[],
         typeHandi:[],
         situation:[],
         isFetching: false,
@@ -19,10 +21,10 @@ const dataSlice = createModule({
         },
         fetchedData: (state, payload) => {
             state.genre = payload.body.genre;
+            state.typeAbonnement = payload.body.typeAbonnement;
             state.documentType = payload.body.documentType;
+            state.typePaiement = payload.body.typePaiement; 
             state.status = payload.body.status;
-            state.typeHandi = payload.body.typeHandi;
-            state.situation = payload.body.situation;
         },
         finishFetching: (state) => {
             state.isFetching = false;

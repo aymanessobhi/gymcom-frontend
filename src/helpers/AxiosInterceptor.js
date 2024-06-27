@@ -49,14 +49,22 @@ const AxiosInterceptor = ({ children }) => {
   };
 
   const configuration = (config) => {
-    if (Boolean(token) && !isTokenExpired(jwtDecode(token))) {
-      config.headers = {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      }
+    // if (Boolean(token) && !isTokenExpired(jwtDecode(token))) {
+    //   config.headers = {
+    //     Authorization: `Bearer ${token}`,
+    //     "Content-Type": "application/json",
+    //   }
+    // }else{
+    //   config.headers = {
+    //     "Content-Type": "application/json",
+    //   }
+    // }
+    config.headers = {
+      "Content-Type": "application/json",
     }
     return config;
   };
+
 
   React.useEffect(() => {
     instance.interceptors.request.use((config) => configuration(config));

@@ -1,6 +1,6 @@
 import { call, put } from "redux-saga/effects";
 import { createModule } from "saga-slice";
-import {  downloadFile, findClientById,  loadClients, saveClient ,  setPrincipleImage, updateClient , uploadData, uploadImageClient } from "../services/clientService";
+import {  downloadFile, findClientById,  loadClients, saveClient ,  setPrincipleImage, updateClient , uploadData, uploadImageClient } from "../services/ClientService";
 
 const clientSlice = createModule({
     name:"client",
