@@ -115,7 +115,7 @@ const Inscription = () => {
                             </TabPane>
 
                             <TabPane tabId={3}>
-                                <ConfirmationTab formik={formik}/>
+                                {/* <ConfirmationTab formik={formik}/> */}
                             </TabPane>
                         </TabContent>
                         </AvForm>
