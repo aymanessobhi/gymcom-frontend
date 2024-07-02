@@ -20,7 +20,7 @@ const Dashboard = () => {
     useEffect(() => {
         setTimeout(() => {
             dispatch(inscriptionActions.list());
-        }, 3000);
+        }, 0);
     }, [])
 
     return (
