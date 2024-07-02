@@ -60,10 +60,10 @@ function Login() {
                                             <div>
                                                 <div className="text-center">
                                                     <div>
-                                                        <Link to="/" className="">
+                                                        {/* <Link to="/" className="">
                                                             <img src={logodark} alt="" height="20" className="auth-logo logo-dark mx-auto" />
                                                             <img src={logolight} alt="" height="20" className="auth-logo logo-light mx-auto" />
-                                                        </Link>
+                                                        </Link> */}
                                                     </div>
                                                     <h4 className="font-size-18 mt-4">Welcome Back !</h4>
                                                     <p className="text-muted">{t('login.title')}</p>
@@ -101,7 +101,7 @@ function Login() {
                                                 </div>
 
                                                 <div className="mt-5 text-center">
-                                                    <p>© 2024 PPM - Performance Pathfinder Metrics. Développé par ONEDOZ</p>
+                                                    <p>© 2024 GYM. Développé par IDERACLOUD</p>
                                                 </div>
                                             </div>
 

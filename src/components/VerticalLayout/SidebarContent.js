@@ -17,7 +17,7 @@ import {
   changePreloader
 } from "../../store/actions";
 import withRouter from "../Common/withRouter";
-import { DASHBOARD_PAGE } from "../../routes/routeConstants";
+import { DASHBOARD_PAGE, LIST_ABONNEE } from "../../routes/routeConstants";
 
 class SidebarContent extends Component {
 
@@ -106,6 +106,12 @@ class SidebarContent extends Component {
                 <i className="ri-dashboard-line"></i>
                 {/* <span className="badge rounded-pill bg-success float-end">3</span> */}
                 <span className="ms-1">{this.props.t('menu.dashboard')}</span>
+              </Link>
+            </li>
+            <li>
+              <Link to={LIST_ABONNEE} className="waves-effect">
+                <i className="ri-dashboard-line"></i>
+                <span className="ms-1">{this.props.t('menu.inscription')}</span>
               </Link>
             </li>
             

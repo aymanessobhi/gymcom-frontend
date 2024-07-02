@@ -9,11 +9,13 @@ import appReducer from './reducers';
 import { rootSaga } from 'saga-slice';
 import appSaga from './sagas';
 import dataSlice from '../sagas/dataSlice';
+import inscriptionSlice from '../sagas/inscriptionSlice';
+import paiementSlice from '../sagas/paiementSlice';
 
 const sagaMiddleware = createSagaMiddleware();
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-const modules = [userSlice,clientSlice, dataSlice ];
+const modules = [userSlice,clientSlice, dataSlice, inscriptionSlice, paiementSlice ];
 
 const store = createStore(appReducer, composeEnhancers(applyMiddleware(sagaMiddleware)));
 sagaMiddleware.run(rootSaga(modules));

@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  Card,
-  CardBody,
-  Col,
-  Container,
-  Label,
-  Row,
-  FormGroup,
-  Form,
-} from "reactstrap";
+import { Button,Card, CardBody,Col,Container,Label,Row,FormGroup,Form,} from "reactstrap";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -24,37 +14,37 @@ import {
 } from "availity-reactstrap-validation";
 
 
-const PaiementTab = ({ formik }) => {
+const PaiementTab = ({ formik, typeValue }) => {
   const { t } = useTranslation("translation");
   const [ TPaiement, setTPaiment ] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   let { id } = useParams();
-  const { getFieldProps, setValues, values} = formik;
+  const { getFieldProps, values, setFieldValue} = formik;
   const { typePaiement, typeAbonnement } = useSelector((state) => state.data);
 
   useEffect(() => {
-    const restAPaye = values.totalAPaye - values.montantPaye;
-    formik.setFieldValue("restAPaye",restAPaye)
+    const type = typeAbonnement.find(t => t.code === typeValue.abonnment)?.value;
+      setFieldValue("totalAPaye", type);
+  }, [typeValue]);
+
+  console.log(typeValue.abonnment)
+
+  useEffect(() => {
+    const rest = values.totalAPaye - values.montantPaye;
+    setFieldValue("resteAPaye", rest);
   }, [values.montantPaye]);
   
   const handleChangeTPaiment = (event) => {
     const { value } = event.target;
     setTPaiment(value);
-    formik.setFieldValue("typePaiement", value);
+    setFieldValue("typePaie", value);
   }
   
   const handleFraisAssuranceChange = ({ target }) => {
-    formik.setFieldValue("assuranceInclu", target.value);
-  };
-
-  const calculateTotalAPaye = () => {
-    const type = typeAbonnement.find(t => t.code === values.typeAbonnement)?.value
-    formik.setFieldValue("typeAbonnement", type);
-    return type;
-  }
-
+    setFieldValue("assuranceInclu", target.value);
+  }; 
 
   return (
     <React.Fragment>
@@ -74,7 +64,7 @@ const PaiementTab = ({ formik }) => {
                         <AvField
                           type="select"
                           className="form-control"
-                          {...getFieldProps("typePaiement")}
+                          {...getFieldProps("typePaie")}
                           onChange={handleChangeTPaiment}
                           validate={{ required: { value: false } }}
                           id="typePaiement"
@@ -141,13 +131,13 @@ const PaiementTab = ({ formik }) => {
                             {t("paiement.totalAPaye")}
                           </Label>
                           <AvField
-                            name="totalAPaye"
+                            {...getFieldProps("totalAPaye")}
                             placeholder={t("paiement.totalAPaye")}
                             type="text"
-                            value={calculateTotalAPaye()}
+                            value={values.totalAPaye}
                             errorMessage={t("message.required")}
                             className="form-control"
-                            validate={{ required: { value: false } }}
+                            validate={{ required: { value: true } }}
                             id="totalAPaye"
                             readOnly
                           />
@@ -175,13 +165,15 @@ const PaiementTab = ({ formik }) => {
                             {t("paiement.resteAPaye")}
                           </Label>
                           <AvField
-                            {...formik.getFieldProps("resteAPaye")}
+                            {...getFieldProps("resteAPaye")}
                             placeholder={t("paiement.resteAPaye")}
                             type="text"
+                            value={values.resteAPaye}
                             errorMessage={t("message.required")}
                             className="form-control"
                             validate={{ required: { value: false } }}
                             id="resteAPaye"
+                            readOnly
                           />
                         </div>
                       </Col>
@@ -215,6 +207,7 @@ const PaiementTab = ({ formik }) => {
       </FormikProvider>
     </React.Fragment>
   );
-};
+
+}
 
 export default PaiementTab;

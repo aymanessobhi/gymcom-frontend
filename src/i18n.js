@@ -26,10 +26,14 @@ const resources = {
         genre:"Genre",
         cin:"CIN",
         abonnement:"Type d'abonnement",
-        dateDebut:"Date de debut",
+        dateDebut:"Date de début",
         dateFin:"Date de Fin",
         identification:"Identification de l'abonné",
-        active:"Active"
+        active:"Active",
+        piecejoint:"Piéce joint",
+        filename:"Nom fichier",
+        dateAbonnement:"Date Abonnement",
+        status:"Status"
       },
       paiement:{
         type:"Type paiement",
@@ -39,7 +43,8 @@ const resources = {
         montantPaye:"Montant payé",
         resteAPaye:"Rest à payé",
         assuranceInclu:"Frais d'assurance inclus",
-        datePaiementCheque:"Date paiement chèque"
+        datePaiementCheque:"Date paiement chèque",
+        datePaiement:"Date paiement"
       },
       login: {
         title: "Connectez-vous pour continuer sur Performance Pathfinder Metrics.",
@@ -52,6 +57,10 @@ const resources = {
         required: "Champ obligatoire",
         invalidEmail:"Email invalide"
       },
+      menu: {
+        dashboard:"Tableau de bord",
+        inscription:"Inscription"
+      },
       actions: {
         save: "Enregistrer",
         delete: "Supprimer",
@@ -63,8 +72,8 @@ const resources = {
         upload:"Données",
         close:"Annuler",
         confirm:"Confirmer",
-        new:"Créer"
-
+        new:"Créer",
+        title:"Action"
       },
       text:{
         confirmation:"Confirmation",

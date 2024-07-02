@@ -15,6 +15,9 @@ export const isTokenExpired = (parsedToken) => {
 };
 const instance = axios.create({
   baseURL: config.baseURL,
+  headers: {
+    'Content-Type': 'application/json',
+}
 });
 
 

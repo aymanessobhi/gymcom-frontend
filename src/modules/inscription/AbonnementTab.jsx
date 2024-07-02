@@ -1,26 +1,16 @@
-import React, { useEffect } from "react";
+import React, { forwardRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  Button,
-  Card,
-  CardBody,
-  Col,
-  Container,
-  Label,
-  Row,
-  FormGroup,
-  Form,
-} from "reactstrap";
+import {Button,Card,CardBody,Col,Container,Label,Row,FormGroup,Form,} from "reactstrap";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router";
 import { FormikProvider } from "formik";
 import { AvForm, AvField, AvRadioGroup, AvRadio } from "availity-reactstrap-validation";
 import AbonnementImage from "./AbonnementImage";
 import { dataActions } from "../../sagas/dataSlice";
 
-const AbonnementTab = ({ formik }) => {
+const AbonnementTab = ({ formik, dateFin }) => {
   const inlineStyle = {
     display: "inline-flex",
     marginRight: "10px",
@@ -34,16 +24,15 @@ const AbonnementTab = ({ formik }) => {
 
   const { genre, typeAbonnement } = useSelector((state) => state.data);
 
-  const breadcrumbItems = [
-    { title: t("abonnement"), link: "#" },
-    { title: id ? t("editabonn") : t("newabonn"), link: "#" },
-  ];
+  useEffect(()=>{
+    formik.setFieldValue('dateFin',dateFin)
+  },[dateFin])
 
   const handleChangeGenre = ({ target }) => {
     formik.setFieldValue("genre", target.value);
   };
   const handleChangeTypeAbonnement = ({ target }) => {
-    formik.setFieldValue("typeAbonnement", target.value);
+    formik.setFieldValue("abonnment", target.value);
   };
 
   const handleChangeTActive = ({ target }) => {
@@ -89,7 +78,7 @@ const AbonnementTab = ({ formik }) => {
                                   type="text"
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="prenom"
                                 />
                               </div>
@@ -104,7 +93,7 @@ const AbonnementTab = ({ formik }) => {
                                   className="form-control"
                                   {...formik.getFieldProps("genre")}
                                   onChange={handleChangeGenre}
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="genre"
                                 >
                                   <option value="">
@@ -129,7 +118,7 @@ const AbonnementTab = ({ formik }) => {
                                   type="text"
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="tele"
                                 />
                               </div>
@@ -148,7 +137,7 @@ const AbonnementTab = ({ formik }) => {
                                   type="date"
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="datenaiss"
                                 />
                               </div>
@@ -164,7 +153,7 @@ const AbonnementTab = ({ formik }) => {
                                   type="text"
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="cin"
                                 />
                               </div>
@@ -190,9 +179,9 @@ const AbonnementTab = ({ formik }) => {
                                 <AvField
                                   type="select"
                                   className="form-control"
-                                  {...formik.getFieldProps("typeAbonnement")}
+                                  {...formik.getFieldProps("abonnment")}
                                   onChange={handleChangeTypeAbonnement}
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="abonnment"
                                 >
                                   <option value="">
@@ -220,7 +209,7 @@ const AbonnementTab = ({ formik }) => {
                                   type="date"
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="dateDebut"
                                 />
                               </div>
@@ -234,10 +223,12 @@ const AbonnementTab = ({ formik }) => {
                                   {...formik.getFieldProps("dateFin")}
                                   placeholder={t("inscription.dateFin")}
                                   type="date"
+                                  value={dateFin}
                                   errorMessage={t("message.required")}
                                   className="form-control"
-                                  validate={{ required: { value: false } }}
+                                  validate={{ required: { value: true } }}
                                   id="dateFin"
+                                  readOnly
                                 />
                               </div>
                             </Col>
@@ -277,11 +268,7 @@ const AbonnementTab = ({ formik }) => {
                     </CardBody>
                   </Card>
                 </Col>
-
-                <Button color="primary" type="submit">
-                  {t("actions.save")}
-                </Button>
-              </CardBody>
+                  </CardBody>
             </Card>
           </Container>
         </FormikProvider>
