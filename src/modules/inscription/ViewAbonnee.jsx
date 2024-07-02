@@ -44,7 +44,7 @@ const ViewAbonnee = () => {
       if (paiement) {
         setInscription(paiement.inscription);
         const photoDoc = paiement.inscription.documents.find(
-          (doc) => doc.type === "CIN_V"
+          (doc) => doc.type === "PHOTO"
         );
         setPhotoDocument(photoDoc);
       }
@@ -265,10 +265,9 @@ const ViewAbonnee = () => {
                         border: "2px solid #ccc",
                         overflow: "hidden",
                       }}
-                    >
-                      {/* Replace 'avatarImageUrl' with the actual URL or path to your avatar image */}
+                    >  {photoDocument ? (
                       <img
-                        src=""
+                        src={`data:${photoDocument.typeFile};base64,${photoDocument.path}`}
                         alt="image"
                         className="img-fluid"
                         style={{
@@ -277,6 +276,9 @@ const ViewAbonnee = () => {
                           objectFit: "cover",
                         }}
                       />
+                    ) : (
+                      <p>No image available</p> // Placeholder message
+                    )}
                     </div>
                   </Col>
                   <Col md="9" sm="12">
