@@ -54,7 +54,13 @@ const ViewAbonnee = () => {
   const paiementList = paiements.filter((p) => p.inscription.id == id);
 
   const totalResteAPaye = paiementList.reduce((accumulator, currentPayment) => {
-    return accumulator + currentPayment.resteAPaye;
+    const val = accumulator + currentPayment.resteAPaye;
+    if(val > 0){
+      return val;
+    }else{
+      return 0;
+    }
+    
   }, 0);
 
   const columns = [
@@ -129,6 +135,12 @@ const ViewAbonnee = () => {
 
   const columnsP = [
     {
+      Header: t("paiement.datePaiement"),
+      accessor: "datePaiement",
+      disableFilters: true,
+      filterable: false,
+    },
+    {
       Header: t("paiement.type"),
       accessor: "typePaie",
       disableFilters: true,
@@ -166,12 +178,7 @@ const ViewAbonnee = () => {
       disableFilters: true,
       filterable: false,
     },
-    {
-      Header: t("paiement.datePaiement"),
-      accessor: "datePaiement",
-      disableFilters: true,
-      filterable: false,
-    },
+    
     {
       Header: t("actions.title"),
       accessor: (cellProps) => (
@@ -267,7 +274,7 @@ const ViewAbonnee = () => {
                       }}
                     >  {photoDocument ? (
                       <img
-                        src={`data:${photoDocument.typeFile};base64,${photoDocument.path}`}
+                        src={`${photoDocument.path}`}
                         alt="image"
                         className="img-fluid"
                         style={{

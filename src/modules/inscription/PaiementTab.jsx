@@ -33,7 +33,12 @@ const PaiementTab = ({ formik, typeValue }) => {
 
   useEffect(() => {
     const rest = values.totalAPaye - values.montantPaye;
-    setFieldValue("resteAPaye", rest);
+    if(rest < 0){
+      setFieldValue("resteAPaye", 0);
+    }else{
+      setFieldValue("resteAPaye", rest);
+    }
+    
   }, [values.montantPaye]);
   
   const handleChangeTPaiment = (event) => {

@@ -85,7 +85,7 @@ const Inscription = () => {
                         }, 3000);
                     });
                 },
-                onError:() => {
+                onError: () => {
                     toast.error("Erreur lors de l'enregistrement des données: veuillez remplir tous les champs requis.")
                 }
             };
@@ -149,7 +149,12 @@ const Inscription = () => {
         <React.Fragment>
             <div className="page-content">
                 <Container fluid={true}>
-                    <Toaster />
+                    <Toaster containerStyle={{
+                        top: 20,
+                        left: 20,
+                        bottom: 20,
+                        right: 20,
+                    }} />
                     <div id="progrss-wizard" className="twitter-bs-wizard">
                         <ul className="twitter-bs-wizard-nav nav-justified nav nav-pills">
                             <NavItem>
