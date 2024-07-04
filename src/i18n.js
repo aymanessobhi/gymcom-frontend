@@ -41,7 +41,7 @@ const resources = {
         dateDebut:"Date de debut",
         totalAPaye:"Total à payé",
         montantPaye:"Montant payé",
-        resteAPaye:"Rest à payé",
+        resteAPaye:"Reste à payé",
         assuranceInclu:"Frais d'assurance inclus",
         datePaiementCheque:"Date paiement chèque",
         datePaiement:"Date paiement"

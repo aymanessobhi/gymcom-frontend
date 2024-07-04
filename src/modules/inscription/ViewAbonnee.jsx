@@ -28,8 +28,9 @@ const ViewAbonnee = () => {
   const [inscription, setInscription] = useState({});
   const [paiement, setPaiement] = useState({});
   const [photoDocument, setPhotoDocument] = useState(null);
-  const { typePaiement, typeAbonnement } = useSelector((state) => state.data);
+  const { typePaiement, typeAbonnement,  documentType } = useSelector((state) => state.data);
   const [record, setRecord] = useState({ open: false, data: null });
+  const [documents, setDocuments] = useState({});
 
   useEffect(() => {
     if (id) {
@@ -43,6 +44,8 @@ const ViewAbonnee = () => {
       setPaiement(paiement);
       if (paiement) {
         setInscription(paiement.inscription);
+        setDocuments(paiement.inscription.documents)
+        console.log(documents)
         const photoDoc = paiement.inscription.documents.find(
           (doc) => doc.type === "PHOTO"
         );
@@ -66,7 +69,9 @@ const ViewAbonnee = () => {
   const columns = [
     {
       Header: t("inscription.documentType"),
-      accessor: "type",
+      accessor: (cellProps) => {
+        return documentType.find(t => t.code === cellProps.type)?.description;
+      },
       disableFilters: true,
       filterable: false,
     },
@@ -142,7 +147,9 @@ const ViewAbonnee = () => {
     },
     {
       Header: t("paiement.type"),
-      accessor: "typePaie",
+      accessor: (cellProps)=>{
+        return typePaiement.find(p => p.code === cellProps.typePaie)?.description;
+      },
       disableFilters: true,
       filterable: false,
     },

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import MiniWidgets from './MiniWidgets'
 import { useDispatch, useSelector } from 'react-redux';
-import { dataActions } from '../../sagas/dataSlice';
+import dataSlice, { dataActions } from '../../sagas/dataSlice';
 import Breadcrumbs from '../../components/Common/Breadcrumb';
 import {Button,Card,CardBody,Col,Container,Label,Row,FormGroup,Form,} from "reactstrap";
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ const Dashboard = () => {
     useEffect(() => {
         setTimeout(() => {
             dispatch(inscriptionActions.list());
+            dispatch(dataActions.loadData());
         }, 0);
     }, [])
 

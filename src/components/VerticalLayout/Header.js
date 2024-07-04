@@ -158,7 +158,7 @@ class Header extends Component {
                                 </div>
                             </div>
 
-                            <LanguageDropdown />
+                            {/* <LanguageDropdown /> */}
 
 
                             <div className="dropdown d-none d-lg-inline-block ms-1">

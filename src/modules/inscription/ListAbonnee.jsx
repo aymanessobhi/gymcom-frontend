@@ -27,6 +27,9 @@ const ListAbonnee = () => {
   const { isFetching, inscriptions } = useSelector(
     (state) => state.inscription
   );
+  const{ genre } = useSelector(
+    (state) => state.data
+  );
   const [record, setRecord] = useState({ open: false, data: null });
 
   const breadcrumbItems = [
@@ -67,7 +70,9 @@ const ListAbonnee = () => {
     },
     {
       Header: t("inscription.genre"),
-      accessor: "genre",
+      accessor: (cellProps)=>{
+        return genre.find( g => g.code === cellProps.genre)?.description;
+      },
       disableFilters: true,
       filterable: false,
     },
@@ -125,22 +130,14 @@ const ListAbonnee = () => {
 
   return (
     <React.Fragment>
-      {isFetching ? (
-        <div id="preloader">
-          <div id="status">
-            <div className="spinner">
-              <i className="ri-loader-line spin-icon"></i>
-            </div>
-          </div>
-        </div>
-      ) : (
+      <Toaster />
         <div className="page-content">
           <Container fluid={true}>
             <Breadcrumbs
               title={t("Abonnement")}
               breadcrumbItems={breadcrumbItems}
             />
-            <Toaster />
+            
             <Card>
               <CardBody>
                 <Col md="12" className="d-flex justify-content-end mb-3">
@@ -200,7 +197,6 @@ const ListAbonnee = () => {
             </ModalBody>
           </Modal>
         </div>
-      )}
     </React.Fragment>
   );
 };

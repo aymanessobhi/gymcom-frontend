@@ -106,7 +106,9 @@ const AbonnementImage = ({ formik }) => {
   const columns = [
     {
       Header: t("inscription.documentType"),
-      accessor: "type",
+      accessor: (cellProps) => {
+        return documentType.find(t => t.code === cellProps.type)?.description;
+      },
       disableFilters: true,
       filterable: false,
     },
