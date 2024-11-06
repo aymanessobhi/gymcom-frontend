@@ -18,59 +18,70 @@ import { useTranslation } from "react-i18next";
 import Inscription from ".";
 import TableContainer from "../../components/Common/TableContainer";
 import { ADD_PAYMENT } from "../../routes/routeConstants";
+import { inscriptionActions } from "../../sagas/inscriptionSlice";
+import { dataActions } from "../../sagas/dataSlice";
+
+
+
 
 const ViewAbonnee = () => {
-  const dispatch = useDispatch();
   const { t } = useTranslation("translation");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { id } = useParams();
-  const { paiements } = useSelector((state) => state.paiement);
+
+  const {
+    isFetching,
+    typePaiement,
+    typeAbonnement,
+    documentType,
+    inscriptions,
+    paiements,
+  } = useSelector((state) => state.data);
+  //const { paiements } = useSelector((state) => state.paiement);
+
   const [inscription, setInscription] = useState({});
-  const [paiement, setPaiement] = useState({});
   const [photoDocument, setPhotoDocument] = useState(null);
-  const { typePaiement, typeAbonnement,  documentType } = useSelector((state) => state.data);
   const [record, setRecord] = useState({ open: false, data: null });
   const [documents, setDocuments] = useState({});
 
-  useEffect(() => {
+  useEffect(()=>{
     if (id) {
-      dispatch(paiementActions.list());
+      dispatch(dataActions.loadData());
     }
-  }, [id, dispatch]);
+  },[])
 
   useEffect(() => {
-    if (paiements && paiements.length > 0) {
-      const paiement = paiements.find((p) => p.inscription.id == id);
-      setPaiement(paiement);
-      if (paiement) {
-        setInscription(paiement.inscription);
-        setDocuments(paiement.inscription.documents)
-        console.log(documents)
-        const photoDoc = paiement.inscription.documents.find(
+    if (inscriptions && inscriptions.length > 0) {
+      const inscription = inscriptions.find((s) => s.id == id);
+      setInscription(inscription);
+
+      if (inscription) {
+        setDocuments(inscription.documents);
+        const photoDoc = inscription.documents.find(
           (doc) => doc.type === "PHOTO"
         );
         setPhotoDocument(photoDoc);
       }
     }
-  }, [paiements, id]);
+  }, [id, inscriptions, paiements]);
 
   const paiementList = paiements.filter((p) => p.inscription.id == id);
 
   const totalResteAPaye = paiementList.reduce((accumulator, currentPayment) => {
     const val = accumulator + currentPayment.resteAPaye;
-    if(val > 0){
+    if (val > 0) {
       return val;
-    }else{
+    } else {
       return 0;
     }
-    
   }, 0);
 
   const columns = [
     {
       Header: t("inscription.documentType"),
       accessor: (cellProps) => {
-        return documentType.find(t => t.code === cellProps.type)?.description;
+        return documentType.find((t) => t.code === cellProps.type)?.description;
       },
       disableFilters: true,
       filterable: false,
@@ -147,8 +158,9 @@ const ViewAbonnee = () => {
     },
     {
       Header: t("paiement.type"),
-      accessor: (cellProps)=>{
-        return typePaiement.find(p => p.code === cellProps.typePaie)?.description;
+      accessor: (cellProps) => {
+        return typePaiement.find((p) => p.code === cellProps.typePaie)
+          ?.description;
       },
       disableFilters: true,
       filterable: false,
@@ -185,7 +197,7 @@ const ViewAbonnee = () => {
       disableFilters: true,
       filterable: false,
     },
-    
+
     {
       Header: t("actions.title"),
       accessor: (cellProps) => (
@@ -199,6 +211,8 @@ const ViewAbonnee = () => {
       filterable: false,
     },
   ];
+
+  //console.log("fetching",isFetching)
 
   const handleDelete = (cellProps) => {
     setRecord({ open: true, data: cellProps });
@@ -220,149 +234,32 @@ const ViewAbonnee = () => {
   const getTypeAbonnementDesc = (code) => {
     return typeAbonnement.find((ta) => ta.code === code)?.description;
   };
+  console.log(isFetching)
 
   return (
-    <div className="page-content">
-      <Container fluid={true}>
-        <Card>
-          <CardBody>
-            <Col md="12" className="d-flex justify-content-end mb-3">
-              <Button
-                color="success"
-                className="mr-2"
-                onClick={() => navigate(`/main/subscriber`)}
-              >
-                {t("Liste des abonnées")}
-              </Button>
-            </Col>
-            <hr />
+    <React.Fragment>
+        <div className="page-content">
+          <Container fluid={true}>
             <Card>
               <CardBody>
-                <Row>
-                  <Col md="4" sm="12" className="d-flex align-items-center">
-                    <div className="d-flex">
-                      <strong className="me-3">
-                        {t("inscription.dateAbonnement")}
-                      </strong>
-                      <p className="mb-0">{inscription.dateDebut}</p>
-                    </div>
-                  </Col>
-                  <Col md="4" sm="12" className="d-flex align-items-center">
-                    <div className="d-flex">
-                      <strong className="me-3">
-                        {t("inscription.abonnement")}
-                      </strong>
-                      <p>{getTypeAbonnementDesc(inscription.abonnment)}</p>
-                    </div>
-                  </Col>
-                  <Col md="4" sm="12" className="d-flex align-items-center">
-                    <div className="d-flex">
-                      <strong className="me-3">{t("Paiement dû")}</strong>
-                      <p className="mb-0">{totalResteAPaye} DH</p>
-                    </div>
-                  </Col>
-                </Row>
-              </CardBody>
-            </Card>
-
-            <h6>{t("Identification")}</h6>
-            <hr />
-            <Card>
-              <CardBody>
-                <Row>
-                  <Col md="3" sm="12">
-                    <div
-                      className="text-center"
-                      style={{
-                        width: "120px",
-                        height: "120px",
-                        border: "2px solid #ccc",
-                        overflow: "hidden",
-                      }}
-                    >  {photoDocument ? (
-                      <img
-                        src={`${photoDocument.path}`}
-                        alt="image"
-                        className="img-fluid"
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      <p>No image available</p> // Placeholder message
-                    )}
-                    </div>
-                  </Col>
-                  <Col md="9" sm="12">
-                    <Row className="mb-3">
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.nom")}
-                          </strong>
-                          <p className="mb-0">{inscription.nom}</p>
-                        </div>
-                      </Col>
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.prenom")}
-                          </strong>
-                          <p className="mb-0">{inscription.prenom}</p>
-                        </div>
-                      </Col>
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.genre")}
-                          </strong>
-                          <p className="mb-0">{inscription.genre}</p>
-                        </div>
-                      </Col>
-                    </Row>
-                    <Row className="mb-3">
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.telephone")}
-                          </strong>
-                          <p className="mb-0">{inscription.tele}</p>
-                        </div>
-                      </Col>
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.datenaiss")}
-                          </strong>
-                          <p className="mb-0">{inscription.datenaiss}</p>
-                        </div>
-                      </Col>
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.cin")}
-                          </strong>
-                          <p className="mb-0">{inscription.cin}</p>
-                        </div>
-                      </Col>
-                    </Row>
+                <Col md="12" className="d-flex justify-content-end mb-3">
+                  <Button
+                    size="sm"
+                    color="success"
+                    className="mr-2"
+                    onClick={() => navigate(`/main/subscriber`)}
+                  >
+                    {t("Liste des abonnées")}
+                  </Button>
+                </Col>
+                <hr />
+                <Card>
+                  <CardBody>
                     <Row>
                       <Col md="4" sm="12" className="d-flex align-items-center">
                         <div className="d-flex">
                           <strong className="me-3">
-                            {t("inscription.abonnement")}
-                          </strong>
-                          <p className="mb-0">
-                            {getTypeAbonnementDesc(inscription.abonnment)}
-                          </p>
-                        </div>
-                      </Col>
-                      <Col md="4" sm="12" className="d-flex align-items-center">
-                        <div className="d-flex">
-                          <strong className="me-3">
-                            {t("inscription.dateDebut")}
+                            {t("inscription.dateAbonnement")}
                           </strong>
                           <p className="mb-0">{inscription.dateDebut}</p>
                         </div>
@@ -370,132 +267,254 @@ const ViewAbonnee = () => {
                       <Col md="4" sm="12" className="d-flex align-items-center">
                         <div className="d-flex">
                           <strong className="me-3">
-                            {t("inscription.dateFin")}
+                            {t("inscription.abonnement")}
                           </strong>
-                          <p className="mb-0">{inscription.dateFin}</p>
+                          <p>{getTypeAbonnementDesc(inscription.abonnment)}</p>
+                        </div>
+                      </Col>
+                      <Col md="4" sm="12" className="d-flex align-items-center">
+                        <div className="d-flex">
+                          <strong className="me-3">{t("Paiement dû")}</strong>
+                          <p className="mb-0">{totalResteAPaye} DH</p>
                         </div>
                       </Col>
                     </Row>
-                  </Col>
-                </Row>
+                  </CardBody>
+                </Card>
+
+                <h6>{t("Identification")}</h6>
+                <hr />
+                <Card>
+                  <CardBody>
+                    <Row>
+                      <Col md="3" sm="12">
+                        <div
+                          className="text-center"
+                          style={{
+                            width: "120px",
+                            height: "120px",
+                            border: "2px solid #ccc",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {" "}
+                          {photoDocument ? (
+                            <img
+                              src={`${photoDocument.path}`}
+                              alt="image"
+                              className="img-fluid"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          ) : (
+                            <p>No image available</p> 
+                          )}
+                        </div>
+                      </Col>
+                      <Col md="9" sm="12">
+                        <Row className="mb-3">
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.nom")}
+                              </strong>
+                              <p className="mb-0">{inscription.nom}</p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.prenom")}
+                              </strong>
+                              <p className="mb-0">{inscription.prenom}</p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.genre")}
+                              </strong>
+                              <p className="mb-0">{inscription.genre}</p>
+                            </div>
+                          </Col>
+                        </Row>
+                        <Row className="mb-3">
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.telephone")}
+                              </strong>
+                              <p className="mb-0">{inscription.tele}</p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.datenaiss")}
+                              </strong>
+                              <p className="mb-0">{inscription.datenaiss}</p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.cin")}
+                              </strong>
+                              <p className="mb-0">{inscription.cin}</p>
+                            </div>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.abonnement")}
+                              </strong>
+                              <p className="mb-0">
+                                {getTypeAbonnementDesc(inscription.abonnment)}
+                              </p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.dateDebut")}
+                              </strong>
+                              <p className="mb-0">{inscription.dateDebut}</p>
+                            </div>
+                          </Col>
+                          <Col
+                            md="4"
+                            sm="12"
+                            className="d-flex align-items-center"
+                          >
+                            <div className="d-flex">
+                              <strong className="me-3">
+                                {t("inscription.dateFin")}
+                              </strong>
+                              <p className="mb-0">{inscription.dateFin}</p>
+                            </div>
+                          </Col>
+                        </Row>
+                      </Col>
+                    </Row>
+                  </CardBody>
+                </Card>
+                <h6>{t("Piece joint")}</h6>
+                <hr />
+                <Card>
+                  <CardBody>
+                    <Row>
+                      <TableContainer
+                        columns={columns || []}
+                        data={inscription.documents ?? []}
+                        isPagination={false}
+                        isAddParamList={true}
+                        customPageSizeOptions={true}
+                        iscustomPageSize={false}
+                        isBordered={false}
+                        customPageSize={10}
+                        canDownloadtemp={true}
+                        isGlobalFilter={false}
+                        className="table-primary"
+                      />
+                    </Row>
+                  </CardBody>
+                </Card>
+                <h6>{t("Paiement")}</h6>
+                <hr />
+                <Card>
+                  <CardBody>
+                    <Col md="12" className="d-flex justify-content-end mb-3">
+                      <Button
+                        size="sm"
+                        color="success"
+                        onClick={() => navigate(`/main/${id}/paiement`)}
+                      >
+                        {t("Nouvelle paiement")}
+                      </Button>
+                    </Col>
+                    <Row>
+                      <TableContainer
+                        columns={columnsP || []}
+                        data={paiementList ?? []}
+                        isPagination={false}
+                        isAddParamList={true}
+                        customPageSizeOptions={true}
+                        iscustomPageSize={false}
+                        isBordered={false}
+                        customPageSize={10}
+                        canDownloadtemp={true}
+                        isGlobalFilter={false}
+                        className="table-primary table-sm"
+                      />
+                    </Row>
+                  </CardBody>
+                </Card>
               </CardBody>
             </Card>
-            <h6>{t("Piece joint")}</h6>
-            <hr />
-            <Card>
-              <CardBody>
-                <Row>
-                  <TableContainer
-                    columns={columns || []}
-                    data={inscription.documents ?? []}
-                    isPagination={false}
-                    isAddParamList={true}
-                    customPageSizeOptions={true}
-                    iscustomPageSize={false}
-                    isBordered={false}
-                    customPageSize={10}
-                    canDownloadtemp={true}
-                    isGlobalFilter={false}
-                    className="table-primary"
-                  />
-                </Row>
-              </CardBody>
-            </Card>
-            <h6>{t("Paiement")}</h6>
-            <hr />
-            <Card>
-              <CardBody>
-                <Col md="12" className="d-flex justify-content-end mb-3">
-                  <Button
-                    size="sm"
-                    color="success"
-                    onClick={() => navigate(`/main/${id}/paiement`)}
-                  >
-                    {t("Nouvelle paiement")}
-                  </Button>
-                </Col>
-                <Row>
-                  <TableContainer
-                    columns={columnsP || []}
-                    data={paiementList ?? []}
-                    isPagination={false}
-                    isAddParamList={true}
-                    customPageSizeOptions={true}
-                    iscustomPageSize={false}
-                    isBordered={false}
-                    customPageSize={10}
-                    canDownloadtemp={true}
-                    isGlobalFilter={false}
-                    className="table-primary"
-                  />
-                </Row>
-              </CardBody>
-            </Card>
-          </CardBody>
-        </Card>
-      </Container>
-      <Modal
-        isOpen={record.open}
-        toggle={() => setRecord({ ...record, open: false })}
-        backdrop="static"
-      >
-        <ModalHeader toggle={() => setRecord({ ...record, open: false })}>
-          {t("text.confirmation")}
-        </ModalHeader>
-        <ModalBody>
-          <p>{t("text.msgDelete")}</p>
-          <ModalFooter>
-            <Button
-              type="button"
-              color="light"
-              onClick={() => setRecord({ ...record, open: false })}
-            >
-              {t("actions.close")}
-            </Button>
-            <Button type="button" color="primary" onClick={confirmDelete}>
-              {t("actions.confirm")}
-            </Button>
-          </ModalFooter>
-        </ModalBody>
-      </Modal>
-    </div>
-    // <div>
-    //     <h2>View Abonnee</h2>
-    //     <div>
-    //         <h3>Inscription Details</h3>
-    //         <p>Nom: {inscription.nom}</p>
-    //         <p>Prénom: {inscription.prenom}</p>
-    //         <p>Téléphone: {inscription.tele}</p>
-    //         <p>Date de Naissance: {inscription.datenaiss}</p>
-    //         <p>CIN: {inscription.cin}</p>
-    //         <p>Abonnement: {inscription.abonnment}</p>
-    //         <p>Genre: {inscription.genre}</p>
-    //         <p>Date Début: {inscription.dateDebut}</p>
-    //         <p>Date Fin: {inscription.dateFin}</p>
-    //         <p>Active: {inscription.active}</p>
-    //         {/* Display other inscription details */}
-    //     </div>
-    //     <div>
-    //         <h3>Photo Document</h3>
-    //         {photoDocument ? (
-    //             <div>
-    //                 <p>Type: {photoDocument.type}</p>
-    //                 <p>Filename: {photoDocument.filename}</p>
-    //                 {photoDocument.path && (
-    //                     <div style={{ border: "1px solid #000", width: "150px", height: "150px", overflow: "hidden" }}>
-    //                         <img
-    //                             src={`data:${photoDocument.fileType};base64,${photoDocument.path}`}
-    //                             alt="Photo Document"
-    //                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
-    //                         />
-    //                     </div>
-    //                 )}
-    //             </div>
-    //         ) : (
-    //             <p>No photo document found</p>
-    //         )}
-    //     </div>
-    // </div>
+          </Container>
+          <Modal
+            isOpen={record.open}
+            toggle={() => setRecord({ ...record, open: false })}
+            backdrop="static"
+          >
+            <ModalHeader toggle={() => setRecord({ ...record, open: false })}>
+              {t("text.confirmation")}
+            </ModalHeader>
+            <ModalBody>
+              <p>{t("text.msgDelete")}</p>
+              <ModalFooter>
+                <Button
+                  type="button"
+                  color="light"
+                  onClick={() => setRecord({ ...record, open: false })}
+                >
+                  {t("actions.close")}
+                </Button>
+                <Button type="button" color="primary" onClick={confirmDelete}>
+                  {t("actions.confirm")}
+                </Button>
+              </ModalFooter>
+            </ModalBody>
+          </Modal>
+        </div>
+    </React.Fragment>
   );
 };
 

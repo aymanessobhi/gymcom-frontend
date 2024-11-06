@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import {Button,Card,CardBody,Col,Container,Label,Row,FormGroup,Form,} from "reactstrap";
+import { useSelector } from "react-redux";
+import {Card,CardBody,Col} from "reactstrap";
 
 const MiniWidgets = () => {
     const { t } = useTranslation("translation");

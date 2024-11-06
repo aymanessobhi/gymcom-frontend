@@ -7,11 +7,10 @@ const dataSlice = createModule({
     initialState: {
         genre:[],
         documentType:[],
-        status:[],
         typePaiement:[],
         typeAbonnement:[],
-        typeHandi:[],
-        situation:[],
+        inscriptions:[],
+        paiements:[],
         isFetching: false,
         error: null
     },
@@ -23,8 +22,9 @@ const dataSlice = createModule({
             state.genre = payload.body.genre;
             state.typeAbonnement = payload.body.typeAbonnement;
             state.documentType = payload.body.documentType;
-            state.typePaiement = payload.body.typePaiement; 
-            state.status = payload.body.status;
+            state.typePaiement = payload.body.typePaiement;
+            state.inscriptions = payload.body.inscriptions;
+            state.paiements = payload.body.paiements;  
         },
         finishFetching: (state) => {
             state.isFetching = false;
